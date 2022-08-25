@@ -2,14 +2,17 @@
 title: "jsPsych6.3.1+Qualtrics導入手順"
 author: "Toshihide Imaruoka (imaru@neptune.kanazawa-it.ac.jp)"
 date: "2022-08-25"
-output: html_document
+output: 
+  rmdformats::downcute:
+    highlight: kate
+    dev: "ragg_png"
 ---
-### 情報源
+## 情報源
   * [関学柏原さんのページ](https://kscscr.com/archives/jspsych-qualtrics-r.html)
   * [関学小林さんのページ](https://honamik-s.github.io/log/post/200512_jspsych-on-qualt/)
   * [それらの情報源](https://kywch.github.io/jsPsych-in-Qualtrics/)
   
-### 手順1: jsPsychで実験を実行する
+## 手順1: jsPsychで実験を実行する
   1. ファイルの送受信を行うための仕組みをインストールする
   * [git Windows 64bit版](https://github.com/git-for-windows/git/releases/download/v2.37.2.windows.2/Git-2.37.2.2-64-bit.exe)をダウンロードしてインストールする。Windows以外の環境の場合は適切なものを選ぶ。
   2. 実験ファイルを公開するための仕組みを用意する
@@ -45,8 +48,8 @@ output: html_document
   6. 動作の確認2（サーバ上でのjsPsych）
   * 5までの手順で、自分のgithubアカウントに実験実施に必要なファイルが送られているはずなので、以下のアカウントにアクセスすることで実験が実施されるはず(xxxxxの部分は自分のアカウント、jpq6は2で作成したrepositoryの名前)
     * https://xxxxx.github.io/jpq6/experiment.html
-  
-### 手順2: QualtricsからjsPsychの実験を実行する
+ 
+## 手順2: QualtricsからjsPsychの実験を実行する
   1. Qualtricsの準備をする
   * [学科専用のQualtricsサイト](https://kanazawait.qualtrics.com/login)からアカウントを作成する（[アカウント作成の説明ファイル](./qualtrics.pdf)）。
   2. Qualtricsで実験実施用のアンケートを作る

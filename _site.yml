@@ -1,0 +1,7 @@
+name: "imrlab instruction"
+navbar:
+  title: "imrlab instruction"
+  left:
+    - text: "Home"
+    - href: setup631.html
+  output_dir: "docs"
