@@ -38,6 +38,7 @@ output:
   ![repositoryのURL](./repourl.png){width="600"}
   
   * ターミナルに下のように打ち込む
+    * cd jpq6（一つ前で最後につけた名前にすること）
     * git remote set-url origin コピーしたURL
     * git push origin main
   5. 動作の確認1（ローカルでのjsPsych）
