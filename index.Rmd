@@ -1,0 +1,14 @@
+---
+title: "imrlab Instruction"
+author: "Toshihide Imaruoka
+(imaru@neptune.kanazawa-it.ac.jp)"
+date: "2022-09-06"
+output: 
+  rmdformats::downcute:
+    highlight: kate
+    dev: "ragg_png"
+---
+## jsPsych-6.3をQualtricsから使う
+  * [環境のセットアップ](setup631.html)
+  * [実験の作り方](makingexps.html)
+  

@@ -1,0 +1,190 @@
+---
+title: "making experiments"
+author: "Toshihide Imaruoka"
+date: "2022-09-06"
+output: 
+  rmdformats::downcute:
+    highlight: kate
+    dev: "ragg_png"
+---
+# jsPsychでの実験作成の基本
+  * 実験の基本は公式にある[反応時間実験のチュートリアル](https://www.jspsych.org/6.3/tutorials/rt-task/)で知ることができる
+  * まずはその概要の説明
+  
+## 「反応時間チュートリアル」の説明
+  * 2種類の色の円（画像ファイルとして用意される）のどちらかを表示し、色に応じてあらかじめ決められたキーで、できるだけ早く、でも正確に反応するという、とても基本的な心理実験
+  
+## ファイルの基本構成
+
+  * jsPsychでの実験の基本構成は、たくさんの部品（var から始まるやつ）とjsPsych.init()という特別な関数。
+    * jsPsych.init()はファイルの最後の方に書かれている
+    * 部品には実験全体の設定のための部品と、試行を構成する部品がある
+      * この資料では、全体設定のための部品を設定部品、実験を構成する部品を実験部品と呼ぶことにする
+    * 実験が部品（オブジェクト）に分かれているというのはjsPsychを作っているプログラミング言語（JavaScript）の特徴でもある
+  * 各部品の説明の前に、まずは全体像から
+  * jsPsych単体で使うときは、基本は1つのhtmlファイルに実験の情報を全て書いておく
+  * htmlファイルなので、全体は\<html\>と\</html\>で囲まれていて、その中に\<script\>\</script\>という部分があり、その中に実験そのものが書かれている。
+    * \<html\>
+    * \<head\>から\</head\>まで：htmlのヘッダ。機能を追加するために別ファイルを読み込む場合、ここにそのことを書いておく。
+    * \<body\>\</body\>：通常のhtmlファイルだとページの内容を書く部分。jsPsychでは基本なにも書かない。
+    * \<script\>
+      * 部品たち
+        * 空のタイムライン作成（timeline: 設定部品1）
+        * 画像の読み込み（preload: 設定部品2）
+        * 最初のメッセージ（welcome: 実験部品1）
+        * 実験の教示（instructions: 実験部品2）
+        * 試行に含まれる変数の設定（test_stimuli: 設定部品3）
+        * 固視点（fixation: 実験部品3）
+        * 実験刺激（test: 実験部品4）
+        * 実験手続き（test_procedure: 設定部品4）
+        * 結果表示（debrief_block: 実験部品5）
+      * jsPsych.init()  
+    * \</script\>
+    * \</html\>
+
+## 部品の説明
+
+### jsPsych.init()
+
+  * まずはファイルの中では一番下に書かれているこれから。これを最初に説明するのは、これが特別なものだから。
+  * 1実験に必ず一つある。実験の基本部分となる関数（厳密にはjsPsychというオブジェクトのinitメソッド？）。
+  * timeline: とon_finish: については、この関数には２つの設定項目があると思うと良い。
+    * timeline項目は必須の設定項目で、実験中にはtimelineに設定されたことだけが実行されることになる。
+    * この例はちょっとややこしくて、timeline: の部分は設定項目としてのtimeline表記。その後ろのtimelineは、このサンプル実験用に作られたtimelineという名前の入れ物。\<script\>の直後に、timelineという名前の空の入れ物として作成されている。最初は空だったtimelineという入れ物に、部品がどんどん追加され、最終的にそれが実行されるイメージ。
+    * on_finishの方は、必須項目ではなく、必要なら書くもの。働きとしては、実験の最後に実行したいことがあったら、ここに書くという感じ。ここでは関数としてjsPsych.data.displayData()というプラグインを実行することで、実験結果を全て表示している。ほかに使えるプラグインは公式サイトで参照可能[左側のpluginのところ](https://www.jspsych.org/6.3/)。
+
+```{JavaScript}
+    jsPsych.init({
+      timeline: timeline,
+      on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });
+```
+
+### timeline（設定部品1：必須項目）
+  * var timeline=[];
+  * jsPsych.init()のtimeline項目に使うための部品を作っている。ただし、ここではまだ中身はない。
+  * ここでtimelineとしているのは単に名前なので、ほかの名前でも大丈夫。その場合、jsPsych.init()の中でも指定する名前が変わることになる。下のソース参照。
+
+```{JavaScript}
+var timeline = [];
+
+//ちなみに
+
+var tl1=[]; //この場合、入れ物の名前はtl1。
+
+// このように入れ物を作った場合、
+
+jsPsychinit({
+  timeline: tl1;  // <- このようにtimelineという設定項目に  tl1を指定することになる
+})
+
+```
+
+### preload（設定部品2：必須じゃないけど、画像や動画を使うときにはやっておくべき）
+  * type: preloadと指定したオブジェクトをtimelineに入れておくと、images: や video: で指定したファイルを実験前に読み込んでおくことができる。画像や動画など、ファイルサイズが大きいものを実験中に読み込むと、そこで時間制御が不正確になってしまうので、これは絶対にやっておくべき。
+  * 画像ファイルはパス込みで指定する必要がある。下図の例は、実験内容を書いたhtmlファイルと同じ場所にあるjspsych-6.3.1というフォルダがあり、さらにその中にあるimgフォルダに読み込みたい画像ファイルがあるという想定。URLで指定すれば、他サーバにある画像を読み込んでおくこともできる。
+  * pluginなので、使うためにはhtmlヘッダにプラグインを指定する必要がある。項目設定の仕方などは公式サイトのreferenceからpluginの[jspsych-preload](https://www.jspsych.org/6.3/plugins/jspsych-preload/)を参照。ここでもプラグインファイルへのパスとファイル名が必要になる。
+  
+  ```{JavaScript}
+      var preload = {
+      type: 'preload',
+      images: ['jspsych-6.3.1/examples/img/blue.png', 'jspsych-6.3.1/examples/img/orange.png']
+    }
+    timeline.push(preload);
+  ```
+  
+  ```{html}
+  <head>
+   <script src="jspsych-6.3.1/plugins/jspsych-preload.js"></script>
+   </head>
+  ```
+  
+### welcome（実験部品1；必須ではない）
+  * 実験の最初に示すメッセージ表示のための部品
+  * 表示部分はhtml形式で作り、反応はキーボードを想定しているので（押さないという設定も可能）、jspsych-html-keyboardプラグインを使用している。
+  * オブジェクトのtype: に"html-keyboard-response"と指定する。
+  * プラグインなので、preloadのとき同様、ファイルをhtmlヘッダに指定する必要がある。
+  * jspsych-html-keyboardプラグインにはstimulusという設定項目があり、そこに表示したい文字を指定すると、それが画面中央に表示される。
+    * ここで表示が画面の中央になるのは、cssという仕組みによるもの。説明は後で。
+  * plugin自体が「htmlで記述したものを表示し、それにキー押しで反応する」という機能をもってるので、何も指定しなくても、何か一つキーを押せばこの部品は終了する。
+  * jspsych-html-keyboardプラグインには他にも設定可能な項目がある。詳細は公式サイト参照。この後で説明するinstructionとfixationという部品にも、ここでは使われていない設定項目が登場している。
+  * welcomeという部品自体の設定はこれで終わり。その後ろにあるtimeline.push(welcome)も重要。
+    * これは、最初の部品として作ったtimelineに、welcomeという部品を追加するということ。こうすることで、後でtimelineが実行されたときに、その中にあるwelcomeも実行されることになる。ちなみに、最初に追加してるので、実行順も最初ということになる。
+  
+  ```{JavaScript}
+      var welcome = {
+      type: "html-keyboard-response",
+      stimulus: "Welcome to the experiment. Press any key to begin."
+    };
+    timeline.push(welcome);
+  ```
+  
+### instruction（実験部品2：必須ではない）
+  * 基本的にはwelcomeと同じ。
+  * 違いは2つ。
+    * stimulus: で指定する表示内容に、htmlのタグを使うことで、複雑な表示ができるようにしている。imgタグを使って画像を読み込んで表示したり、style属性を使って画像位置を左寄せ、右寄せしたりなど。
+    * post_trial_gap: という設定をすることで、表示が消えてから次の部品が実行するまでの時間間隔を指定することができる。下の例では2000が指定されているので、2000ミリ秒＝2秒待ってから次の部品が実行されることになる。
+  * welcome同様、timelineにpushしておくのを忘れない。
+  
+  ```{JavaScript}
+  var instructions = {
+      type: "html-keyboard-response",
+      stimulus: `
+        <p>In this experiment, a circle will appear in the center 
+        of the screen.</p><p>If the circle is <strong>blue</strong>, 
+        press the letter F on the keyboard as fast as you can.</p>
+        <p>If the circle is <strong>orange</strong>, press the letter J 
+        as fast as you can.</p>
+        <div style='width: 700px;'>
+        <div style='float: left;'><img src='jspsych-6.3.1/examples/img/blue.png'></img>
+        <p class='small'><strong>Press the F key</strong></p></div>
+        <div style='float: right;'><img src='jspsych-6.3.1/examples/img/orange.png'></img>
+        <p class='small'><strong>Press the J key</strong></p></div>
+        </div>
+        <p>Press any key to begin.</p>
+      `,
+      post_trial_gap: 2000
+    };
+    timeline.push(instructions);
+  ```
+### test_stimuli（設定部品3：必須じゃないけどほとんどの場合設定する）
+  * 多くの実験では、毎試行同じ刺激ばかり呈示されるわけではなく、実験条件に従って刺激が変化し、変化した刺激に応じて反応時の正解キーが変わったりする。その設定をするための部品。つまり、実験における変数の設定。
+  * 下の例では、stimulusという設定とcorrect_responseという設定の2種類が設定されている。実験の中では、ここで{}で囲まれたものがセットで選択されることになる。
+    * stimulusがblue.pngのときはcorrect_responseはfということになる
+    * 青い円が表示されたときの正解キーはfということに対応している
+  * この部品はすぐに使われるわけではないので、timelineにはpushされない。
+    * あとでtestという部品の中で使われることになる。
+  
+```{JavaScript}
+   var test_stimuli = [
+      { stimulus: "jspsych-6.3.1/examples/img/blue.png",  correct_response: 'f'},
+      { stimulus: "jspsych-6.3.1/examples/img/orange.png",  correct_response: 'j'}
+    ];
+```
+  
+### fixation（実験部品3：必須ではないけど、同じようなものはほぼ使うことになる）
+  * 各試行のはじまりのときに参加者の状態を統制するために固視点を呈示することは、とてもよくある
+    * 似たような目的で、「準備ができたらキーを押してください」などの文字を呈示することもある
+  * ここでは表示は+という文字で固定なので、stimulus: にそれを書くだけ。ただし、+を大きく表示するためにhtmlのdiv要素のstyle属性でfont-sizeを指定している。ここは60pxとピクセル単位での設定としている。
+  * ここではjspsych-html-keyboardというプラグインのchoice、trial_duration、dataという3つの設定項目が新たに登場している。
+  * choiceという設定項目は、ここで押すべきキーを設定するところ。fixationではキー押しが求められない（＝見てると設定時間経過後に勝手に消える）ので、そのときにはjspsych.NO_KEYSと指定すればよい。特定のキーを設定したいときは、この後で出てくるtestという部品のchoiceのところを参照する。
+  * trial_durationという設定項目は、この部品自体の持続時間の設定。ここではキー押しを使わないことになっているので、例えばここに1000と指定すれば、1秒間「＋」が表示されたら自動的に次に進むことになる。
+    * この例では固視点の呈示時間をランダムに決めているので、関数とプラグインを使って複雑なことをしている。何かをランダムにしたいときに便利な仕組みなので覚えておくとよい。
+  * dataという設定項目は、実験結果とするためのデータの設定。基本的には、jsPsychのjspsych-html-keyboardやjspsych-image-keyboardなど、刺激と反応がセットになってる部品で得られたデータは全て取得されるようになっている（例えば反応時間や反応キーなど）。それに加えてデータとして残しておきたいものを指定することができる。ここでは、データの中にtaskというカテゴリを作って、そこにfixationと記録しておくように、という設定をしている。同じようなことをしている次のtest部品と区別するための記述。
+  * welcomeやinstructionのときは、
+  
+  ```{JavaScript}
+      var fixation = {
+      type: 'html-keyboard-response',
+      stimulus: '<div style="font-size:60px;">+</div>',
+      choices: jsPsych.NO_KEYS,
+      trial_duration: function(){
+        return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000, 1250, 1500, 1750, 2000], 1)[0];
+      },
+      data: {
+        task: 'fixation'
+      }
+    }
+  ```

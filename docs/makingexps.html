@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="pandoc" />
+
+        <meta name="author" content="Toshihide Imaruoka" />
+    
+        <meta name="date" content="2022-09-06" />
+    
+    <title>making experiments</title>
+
+        <script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+        <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link href="site_libs/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+        <script src="site_libs/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+        <script src="site_libs/navigation-1.1/tabsets.js"></script>
+        <link href="site_libs/downcute-0.1/downcute.css" rel="stylesheet" />
+        <link href="site_libs/downcute-0.1/downcute_fonts_embed.css" rel="stylesheet" />
+        <script src="site_libs/downcute-0.1/downcute_styles.js"></script>
+        <script src="site_libs/downcute-0.1/downcute.js"></script>
+        <script src="site_libs/prism-1.22/prism.js"></script>
+    
+    
+    
+    
+    <!-- tabsets -->
+    <script>
+      $(document).ready(function () {
+	  window.buildTabsets("toc");
+      });
+      $(document).ready(function () {
+	  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+	      $(this).parent().toggleClass('nav-tabs-open')
+	  });
+      });
+    </script>
+
+    <!-- code folding -->
+    
+    <!-- code download -->
+    
+    <!-- tabsets dropdown -->
+
+    <style type="text/css">
+      .tabset-dropdown > .nav-tabs {
+	  display: inline-table;
+	  max-height: 500px;
+	  min-height: 44px;
+	  overflow-y: auto;
+	  background: white;
+	  border: 1px solid #ddd;
+	  border-radius: 4px;
+      }
+      
+      .tabset-dropdown > .nav-tabs > li.active:before {
+	  content: "";
+	  font-family: 'Glyphicons Halflings';
+	  display: inline-block;
+	  padding: 10px;
+	  border-right: 1px solid #ddd;
+      }
+      
+      .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+	  content: "&#xe258;";
+	  border: none;
+      }
+      
+      .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+	  content: "";
+	  font-family: 'Glyphicons Halflings';
+	  display: inline-block;
+	  padding: 10px;
+	  border-right: 1px solid #ddd;
+      }
+      
+      .tabset-dropdown > .nav-tabs > li.active {
+	  display: block;
+      }
+
+      .tabset-dropdown > .nav-tabs > li.active a {
+  	  padding: 0 15px !important;
+      }
+
+      .tabset-dropdown > .nav-tabs > li > a,
+      .tabset-dropdown > .nav-tabs > li > a:focus,
+      .tabset-dropdown > .nav-tabs > li > a:hover {
+	  border: none;
+	  display: inline-block;
+	  border-radius: 4px;
+	  background-color: transparent;
+      }
+      
+      .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+	  display: block;
+	  float: none;
+      }
+      
+      .tabset-dropdown > .nav-tabs > li {
+	  display: none;
+	  margin-left: 0 !important;
+      }
+    </style>
+    
+</head>
+
+<body class="preload">
+
+   	
+               <!-- downcute start -->   
+   <div id="docute" class="Root theme-default">
+     <div class="Page layout-narrow">
+      <div class="Wrap">
+        <div class="Sidebar">
+          <div class="SidebarItems" id="toc">
+            <ul>
+            <li><a href="#jspsychでの実験作成の基本"
+            id="toc-jspsychでの実験作成の基本">jsPsychでの実験作成の基本</a>
+            <ul>
+            <li><a href="#反応時間チュートリアルの説明"
+            id="toc-反応時間チュートリアルの説明">「反応時間チュートリアル」の説明</a></li>
+            <li><a href="#ファイルの基本構成"
+            id="toc-ファイルの基本構成">ファイルの基本構成</a></li>
+            <li><a href="#部品の説明"
+            id="toc-部品の説明">部品の説明</a></li>
+            </ul></li>
+            </ul>
+          </div>
+          <div data-position="sidebar:post-end" class="InjectedComponents"><div class="dark-theme-toggler"><div class="toggle "><div class="toggle-track"><div class="toggle-track-check"><img  src="data:image/png;base64,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" role="presentation" style="pointer-events: none;" width="16" height="16"></div> <div class="toggle-track-x"><img src="data:image/png;base64,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" role="presentation" style="pointer-events: none;" width="16" height="16"></div></div> <div class="toggle-thumb"></div></div> <input type="checkbox" aria-label="Switch between Dark and Default theme" class="toggler-screen-reader-only"></div></div>
+        </div>
+        <div class="Main">
+          <div class="Content" id="content"> 
+   
+   
+      
+      <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html">imrlab instruction</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="dropdown-header">Home</li>
+      <li>
+        <a href="setup631.html"></a>
+      </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container -->
+      </div><!--/.navbar -->
+        
+      <h1 class="title">making experiments</h1>
+      
+      <p class="authors">
+           <span class="glyphicon glyphicon-user"></span> Toshihide
+Imaruoka
+      </p>
+         <p class="date"><span class="glyphicon glyphicon-calendar"></span> 2022-09-06</p>
+           
+
+   
+      
+   
+<!-- Don't indent these lines or it will mess pre blocks indentation --> 
+<div class="page-content has-page-title">
+<div id="jspsychでの実験作成の基本" class="section level1">
+<h1>jsPsychでの実験作成の基本</h1>
+<ul>
+<li>実験の基本は公式にある<a
+href="https://www.jspsych.org/6.3/tutorials/rt-task/">反応時間実験のチュートリアル</a>で知ることができる</li>
+<li>まずはその概要の説明</li>
+</ul>
+<div id="反応時間チュートリアルの説明" class="section level2">
+<h2>「反応時間チュートリアル」の説明</h2>
+<ul>
+<li>2種類の色の円（画像ファイルとして用意される）のどちらかを表示し、色に応じてあらかじめ決められたキーで、できるだけ早く、でも正確に反応するという、とても基本的な心理実験</li>
+</ul>
+</div>
+<div id="ファイルの基本構成" class="section level2">
+<h2>ファイルの基本構成</h2>
+<ul>
+<li>jsPsychでの実験の基本構成は、たくさんの部品（var
+から始まるやつ）とjsPsych.init()という特別な関数。
+<ul>
+<li>jsPsych.init()はファイルの最後の方に書かれている</li>
+<li>部品には実験全体の設定のための部品と、試行を構成する部品がある
+<ul>
+<li>この資料では、全体設定のための部品を設定部品、実験を構成する部品を実験部品と呼ぶことにする</li>
+</ul></li>
+<li>実験が部品（オブジェクト）に分かれているというのはjsPsychを作っているプログラミング言語（JavaScript）の特徴でもある</li>
+</ul></li>
+<li>各部品の説明の前に、まずは全体像から</li>
+<li>jsPsych単体で使うときは、基本は1つのhtmlファイルに実験の情報を全て書いておく</li>
+<li>htmlファイルなので、全体は&lt;html&gt;と&lt;/html&gt;で囲まれていて、その中に&lt;script&gt;&lt;/script&gt;という部分があり、その中に実験そのものが書かれている。
+<ul>
+<li>&lt;html&gt;</li>
+<li>&lt;head&gt;から&lt;/head&gt;まで：htmlのヘッダ。機能を追加するために別ファイルを読み込む場合、ここにそのことを書いておく。</li>
+<li>&lt;body&gt;&lt;/body&gt;：通常のhtmlファイルだとページの内容を書く部分。jsPsychでは基本なにも書かない。</li>
+<li>&lt;script&gt;
+<ul>
+<li>部品たち
+<ul>
+<li>空のタイムライン作成（timeline: 設定部品1）</li>
+<li>画像の読み込み（preload: 設定部品2）</li>
+<li>最初のメッセージ（welcome: 実験部品1）</li>
+<li>実験の教示（instructions: 実験部品2）</li>
+<li>試行に含まれる変数の設定（test_stimuli: 設定部品3）</li>
+<li>固視点（fixation: 実験部品3）</li>
+<li>実験刺激（test: 実験部品4）</li>
+<li>実験手続き（test_procedure: 設定部品4）</li>
+<li>結果表示（debrief_block: 実験部品5）</li>
+</ul></li>
+<li>jsPsych.init()<br />
+</li>
+</ul></li>
+<li>&lt;/script&gt;</li>
+<li>&lt;/html&gt;</li>
+</ul></li>
+</ul>
+</div>
+<div id="部品の説明" class="section level2">
+<h2>部品の説明</h2>
+<div id="jspsych.init" class="section level3">
+<h3>jsPsych.init()</h3>
+<ul>
+<li>まずはファイルの中では一番下に書かれているこれから。これを最初に説明するのは、これが特別なものだから。</li>
+<li>1実験に必ず一つある。実験の基本部分となる関数（厳密にはjsPsychというオブジェクトのinitメソッド？）。</li>
+<li>timeline: とon_finish:
+については、この関数には２つの設定項目があると思うと良い。
+<ul>
+<li>timeline項目は必須の設定項目で、実験中にはtimelineに設定されたことだけが実行されることになる。</li>
+<li>この例はちょっとややこしくて、timeline:
+の部分は設定項目としてのtimeline表記。その後ろのtimelineは、このサンプル実験用に作られたtimelineという名前の入れ物。&lt;script&gt;の直後に、timelineという名前の空の入れ物として作成されている。最初は空だったtimelineという入れ物に、部品がどんどん追加され、最終的にそれが実行されるイメージ。</li>
+<li>on_finishの方は、必須項目ではなく、必要なら書くもの。働きとしては、実験の最後に実行したいことがあったら、ここに書くという感じ。ここでは関数としてjsPsych.data.displayData()というプラグインを実行することで、実験結果を全て表示している。ほかに使えるプラグインは公式サイトで参照可能<a
+href="https://www.jspsych.org/6.3/">左側のpluginのところ</a>。</li>
+</ul></li>
+</ul>
+<pre class="javascript"><code>    jsPsych.init({
+      timeline: timeline,
+      on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });</code></pre>
+</div>
+<div id="timeline設定部品1必須項目" class="section level3">
+<h3>timeline（設定部品1：必須項目）</h3>
+<ul>
+<li>var timeline=[];</li>
+<li>jsPsych.init()のtimeline項目に使うための部品を作っている。ただし、ここではまだ中身はない。</li>
+<li>ここでtimelineとしているのは単に名前なので、ほかの名前でも大丈夫。その場合、jsPsych.init()の中でも指定する名前が変わることになる。下のソース参照。</li>
+</ul>
+<pre class="javascript"><code>var timeline = [];
+
+//ちなみに
+
+var tl1=[]; //この場合、入れ物の名前はtl1。
+
+// このように入れ物を作った場合、
+
+jsPsychinit({
+  timeline: tl1;  // &lt;- このようにtimelineという設定項目に  tl1を指定することになる
+})
+</code></pre>
+</div>
+<div
+id="preload設定部品2必須じゃないけど画像や動画を使うときにはやっておくべき"
+class="section level3">
+<h3>preload（設定部品2：必須じゃないけど、画像や動画を使うときにはやっておくべき）</h3>
+<ul>
+<li>type: preloadと指定したオブジェクトをtimelineに入れておくと、images:
+や video:
+で指定したファイルを実験前に読み込んでおくことができる。画像や動画など、ファイルサイズが大きいものを実験中に読み込むと、そこで時間制御が不正確になってしまうので、これは絶対にやっておくべき。</li>
+<li>画像ファイルはパス込みで指定する必要がある。下図の例は、実験内容を書いたhtmlファイルと同じ場所にあるjspsych-6.3.1というフォルダがあり、さらにその中にあるimgフォルダに読み込みたい画像ファイルがあるという想定。URLで指定すれば、他サーバにある画像を読み込んでおくこともできる。</li>
+<li>pluginなので、使うためにはhtmlヘッダにプラグインを指定する必要がある。項目設定の仕方などは公式サイトのreferenceからpluginの<a
+href="https://www.jspsych.org/6.3/plugins/jspsych-preload/">jspsych-preload</a>を参照。ここでもプラグインファイルへのパスとファイル名が必要になる。</li>
+</ul>
+<pre class="javascript"><code>    var preload = {
+    type: &#39;preload&#39;,
+    images: [&#39;jspsych-6.3.1/examples/img/blue.png&#39;, &#39;jspsych-6.3.1/examples/img/orange.png&#39;]
+  }
+  timeline.push(preload);</code></pre>
+<pre class="html"><code>&lt;head&gt;
+ &lt;script src=&quot;jspsych-6.3.1/plugins/jspsych-preload.js&quot;&gt;&lt;/script&gt;
+ &lt;/head&gt;</code></pre>
+</div>
+<div id="welcome実験部品1必須ではない" class="section level3">
+<h3>welcome（実験部品1；必須ではない）</h3>
+<ul>
+<li>実験の最初に示すメッセージ表示のための部品</li>
+<li>表示部分はhtml形式で作り、反応はキーボードを想定しているので（押さないという設定も可能）、jspsych-html-keyboardプラグインを使用している。</li>
+<li>オブジェクトのtype: に”html-keyboard-response”と指定する。</li>
+<li>プラグインなので、preloadのとき同様、ファイルをhtmlヘッダに指定する必要がある。</li>
+<li>jspsych-html-keyboardプラグインにはstimulusという設定項目があり、そこに表示したい文字を指定すると、それが画面中央に表示される。
+<ul>
+<li>ここで表示が画面の中央になるのは、cssという仕組みによるもの。説明は後で。</li>
+</ul></li>
+<li>plugin自体が「htmlで記述したものを表示し、それにキー押しで反応する」という機能をもってるので、何も指定しなくても、何か一つキーを押せばこの部品は終了する。</li>
+<li>jspsych-html-keyboardプラグインには他にも設定可能な項目がある。詳細は公式サイト参照。この後で説明するinstructionとfixationという部品にも、ここでは使われていない設定項目が登場している。</li>
+<li>welcomeという部品自体の設定はこれで終わり。その後ろにあるtimeline.push(welcome)も重要。
+<ul>
+<li>これは、最初の部品として作ったtimelineに、welcomeという部品を追加するということ。こうすることで、後でtimelineが実行されたときに、その中にあるwelcomeも実行されることになる。ちなみに、最初に追加してるので、実行順も最初ということになる。</li>
+</ul></li>
+</ul>
+<pre class="javascript"><code>    var welcome = {
+    type: &quot;html-keyboard-response&quot;,
+    stimulus: &quot;Welcome to the experiment. Press any key to begin.&quot;
+  };
+  timeline.push(welcome);</code></pre>
+</div>
+<div id="instruction実験部品2必須ではない" class="section level3">
+<h3>instruction（実験部品2：必須ではない）</h3>
+<ul>
+<li>基本的にはwelcomeと同じ。</li>
+<li>違いは2つ。
+<ul>
+<li>stimulus:
+で指定する表示内容に、htmlのタグを使うことで、複雑な表示ができるようにしている。imgタグを使って画像を読み込んで表示したり、style属性を使って画像位置を左寄せ、右寄せしたりなど。</li>
+<li>post_trial_gap:
+という設定をすることで、表示が消えてから次の部品が実行するまでの時間間隔を指定することができる。下の例では2000が指定されているので、2000ミリ秒＝2秒待ってから次の部品が実行されることになる。</li>
+</ul></li>
+<li>welcome同様、timelineにpushしておくのを忘れない。</li>
+</ul>
+<pre class="javascript"><code>var instructions = {
+    type: &quot;html-keyboard-response&quot;,
+    stimulus: `
+      &lt;p&gt;In this experiment, a circle will appear in the center 
+      of the screen.&lt;/p&gt;&lt;p&gt;If the circle is &lt;strong&gt;blue&lt;/strong&gt;, 
+      press the letter F on the keyboard as fast as you can.&lt;/p&gt;
+      &lt;p&gt;If the circle is &lt;strong&gt;orange&lt;/strong&gt;, press the letter J 
+      as fast as you can.&lt;/p&gt;
+      &lt;div style=&#39;width: 700px;&#39;&gt;
+      &lt;div style=&#39;float: left;&#39;&gt;&lt;img src=&#39;jspsych-6.3.1/examples/img/blue.png&#39;&gt;&lt;/img&gt;
+      &lt;p class=&#39;small&#39;&gt;&lt;strong&gt;Press the F key&lt;/strong&gt;&lt;/p&gt;&lt;/div&gt;
+      &lt;div style=&#39;float: right;&#39;&gt;&lt;img src=&#39;jspsych-6.3.1/examples/img/orange.png&#39;&gt;&lt;/img&gt;
+      &lt;p class=&#39;small&#39;&gt;&lt;strong&gt;Press the J key&lt;/strong&gt;&lt;/p&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;Press any key to begin.&lt;/p&gt;
+    `,
+    post_trial_gap: 2000
+  };
+  timeline.push(instructions);</code></pre>
+</div>
+<div id="test_stimuli設定部品3必須じゃないけどほとんどの場合設定する"
+class="section level3">
+<h3>test_stimuli（設定部品3：必須じゃないけどほとんどの場合設定する）</h3>
+<ul>
+<li>多くの実験では、毎試行同じ刺激ばかり呈示されるわけではなく、実験条件に従って刺激が変化し、変化した刺激に応じて反応時の正解キーが変わったりする。その設定をするための部品。つまり、実験における変数の設定。</li>
+<li>下の例では、stimulusという設定とcorrect_responseという設定の2種類が設定されている。実験の中では、ここで{}で囲まれたものがセットで選択されることになる。
+<ul>
+<li>stimulusがblue.pngのときはcorrect_responseはfということになる</li>
+<li>青い円が表示されたときの正解キーはfということに対応している</li>
+</ul></li>
+<li>この部品はすぐに使われるわけではないので、timelineにはpushされない。
+<ul>
+<li>あとでtestという部品の中で使われることになる。</li>
+</ul></li>
+</ul>
+<pre class="javascript"><code>   var test_stimuli = [
+      { stimulus: &quot;jspsych-6.3.1/examples/img/blue.png&quot;,  correct_response: &#39;f&#39;},
+      { stimulus: &quot;jspsych-6.3.1/examples/img/orange.png&quot;,  correct_response: &#39;j&#39;}
+    ];</code></pre>
+</div>
+<div
+id="fixation実験部品3必須ではないけど同じようなものはほぼ使うことになる"
+class="section level3">
+<h3>fixation（実験部品3：必須ではないけど、同じようなものはほぼ使うことになる）</h3>
+<ul>
+<li>各試行のはじまりのときに参加者の状態を統制するために固視点を呈示することは、とてもよくある
+<ul>
+<li>似たような目的で、「準備ができたらキーを押してください」などの文字を呈示することもある</li>
+</ul></li>
+<li>ここでは表示は+という文字で固定なので、stimulus:
+にそれを書くだけ。ただし、+を大きく表示するためにhtmlのdiv要素のstyle属性でfont-sizeを指定している。ここは60pxとピクセル単位での設定としている。</li>
+<li>ここではjspsych-html-keyboardというプラグインのchoice、trial_duration、dataという3つの設定項目が新たに登場している。</li>
+<li>choiceという設定項目は、ここで押すべきキーを設定するところ。fixationではキー押しが求められない（＝見てると設定時間経過後に勝手に消える）ので、そのときにはjspsych.NO_KEYSと指定すればよい。特定のキーを設定したいときは、この後で出てくるtestという部品のchoiceのところを参照する。</li>
+<li>trial_durationという設定項目は、この部品自体の持続時間の設定。ここではキー押しを使わないことになっているので、例えばここに1000と指定すれば、1秒間「＋」が表示されたら自動的に次に進むことになる。
+<ul>
+<li>この例では固視点の呈示時間をランダムに決めているので、関数とプラグインを使って複雑なことをしている。何かをランダムにしたいときに便利な仕組みなので覚えておくとよい。</li>
+</ul></li>
+<li>dataという設定項目は、実験結果とするためのデータの設定。基本的には、jsPsychのjspsych-html-keyboardやjspsych-image-keyboardなど、刺激と反応がセットになってる部品で得られたデータは全て取得されるようになっている（例えば反応時間や反応キーなど）。それに加えてデータとして残しておきたいものを指定することができる。ここでは、データの中にtaskというカテゴリを作って、そこにfixationと記録しておくように、という設定をしている。同じようなことをしている次のtest部品と区別するための記述。</li>
+<li>welcomeやinstructionのときは、</li>
+</ul>
+<pre class="javascript"><code>    var fixation = {
+    type: &#39;html-keyboard-response&#39;,
+    stimulus: &#39;&lt;div style=&quot;font-size:60px;&quot;&gt;+&lt;/div&gt;&#39;,
+    choices: jsPsych.NO_KEYS,
+    trial_duration: function(){
+      return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000, 1250, 1500, 1750, 2000], 1)[0];
+    },
+    data: {
+      task: &#39;fixation&#39;
+    }
+  }</code></pre>
+</div>
+</div>
+</div>
+</div>
+
+   
+   
+              </div>
+  </div>
+  </div>
+  </div>
+   
+      
+
+  <script>
+    $(document).ready(function () {
+
+		// add bootstrap table styles to pandoc tables
+	$('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+		
+ 		
+	    });
+  </script>
+
+
+
+    <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+	var script = document.createElement("script");
+	script.type = "text/javascript";
+	script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+	document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+  
+</body>
+</html>
