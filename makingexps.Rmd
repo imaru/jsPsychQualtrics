@@ -172,8 +172,9 @@ jsPsychinit({
   * choiceという設定項目は、ここで押すべきキーを設定するところ。fixationではキー押しが求められない（＝見てると設定時間経過後に勝手に消える）ので、そのときにはjspsych.NO_KEYSと指定すればよい。特定のキーを設定したいときは、この後で出てくるtestという部品のchoiceのところを参照する。
   * trial_durationという設定項目は、この部品自体の持続時間の設定。ここではキー押しを使わないことになっているので、例えばここに1000と指定すれば、1秒間「＋」が表示されたら自動的に次に進むことになる。
     * この例では固視点の呈示時間をランダムに決めているので、関数とプラグインを使って複雑なことをしている。何かをランダムにしたいときに便利な仕組みなので覚えておくとよい。
-  * dataという設定項目は、実験結果とするためのデータの設定。基本的には、jsPsychのjspsych-html-keyboardやjspsych-image-keyboardなど、刺激と反応がセットになってる部品で得られたデータは全て取得されるようになっている（例えば反応時間や反応キーなど）。それに加えてデータとして残しておきたいものを指定することができる。ここでは、データの中にtaskというカテゴリを作って、そこにfixationと記録しておくように、という設定をしている。同じようなことをしている次のtest部品と区別するための記述。
-  * welcomeやinstructionのときは、
+  * dataという設定項目は、実験結果として記録するためのデータの設定。基本的には、jsPsychのjspsych-html-keyboardやjspsych-image-keyboardなど、刺激と反応がセットになってる部品で得られたデータは、何もしなくても全て取得されるようになっている（例えば反応時間や反応キーなど）。それに加えてデータとして残しておきたいものを指定することができる。ここでは、データの中にtaskというカテゴリを作って、そこにfixationと記録しておくように、という設定をしている。同じようなことをしている次のtest部品と区別するための記述。
+  * これで{}を閉じてfixationは閉じられる。welcomeやinstructionのときは、この後でtimelineにpushして実行する部品として登録してたけど、ここではやらない。
+    * ここでpushしない理由はfixationと次のtestがまとめられて1試行となっているため。welcomeやinstructionは実験開始時に一回だけ実行しない内容なのに対して、fixationとtestは試行回数分繰り返される必要がある。そのため、fixationとtestを一つの入れ物（後で出てくるtest_procedure）に入れて、それを後でtimelineに追加するというやり方をする。この仕組みも多くの実験で使うことになるはず。
   
   ```{JavaScript}
       var fixation = {
@@ -188,3 +189,101 @@ jsPsychinit({
       }
     }
   ```
+  
+### test（実験部品4：ほぼ必須）
+  * 反応するための刺激を表示して、反応を取得している部品。この実験の場合、反応のための刺激には画像を使ってるので、image-keyboard-responseプラグインを使っている。設定されている項目は以下。
+    * type：ここでプラグインを指定
+    * stimulus：この実験では刺激は青色かオレンジ色の円が描かれた画像ファイル。そのどちらかを選んで刺激として使うので、ここには画像ファイルを直接書くのではなく、前の方で作ったtest_stimuliという入れ物の中にあるstimulus項目（そこには青とオレンジの画像が指定してある）という形で指定する。どっちの画像をどういう順序で何度選んでくるかという指定は、また別のところで後にやる。
+    * choice：*-keyboard-response系のプラグインでは反応に使えるキーを限定することができる。それをやってるのがここ。この実験ではfキーとjキーしか使えなくしている。fixationのときは使えるキーを無しにすることで、反応を受け付けないようにしていた。
+    * correct_response：多くの実験では刺激に対して正解の反応が決まっていて、その正誤もデータとなる。そのため正解反応を決めなくてはいけない。この実験では2種類の刺激画像があって、それぞれに正解となるキーが決まっているので、ここに直接 f などとキーを指定することはできない。実験変数となっているので、ここも前に作ったtest_stimuliの中で指定してあったcorrect_responseを呼び出してくれば良い。上のstimulusで呼び出される画像と、ここで読み出されるcorrect_responseはセットで呼び出されるので、青のときはfが正解、オレンジのときはjが正解という対応関係が出来上がる。
+    * on_finish：1試行の最後に何かやりたいときに指定する。この実験では、反応の正誤を記録するために、この仕組みを使っている。何も指定しなくても記録される反応キー（data.response）と、実験変数として指定した正答キー（data.correct_response; 一つ前の項目で呼び出したやつ)を比べた結果をdata.correctに代入している。JavaScriptでは比較した結果が等しければtrue, 等しくなければfalseが返されるので、data.correctにはどちらかがはいるはず（ただし、それを参照するときにはちょっとややこしいことをやる必要がある。この説明もそのうち書く）。
+  * ここでtestは終わり。fixationと同様、testも試行分繰り返すので、ここではtimelineにpushしない。
+    
+```{JavaScript}
+     var test = {
+      type: "image-keyboard-response",
+      stimulus: jsPsych.timelineVariable('stimulus'),
+      choices: ['f', 'j'],
+      data: {
+        task: 'response',
+        correct_response: jsPsych.timelineVariable('correct_response')
+      },
+      on_finish: function(data){
+        data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
+      }
+    }
+```
+
+### test_procedure（設定部品4：ほぼ必須）
+  * 実験1試行で起きることを一つにまとめるための部品。test_procedureという入れ物に、1試行でやることを入れておく感じ。この部品の中で使うtimelineとして、試行内で実行するものを指定する。
+    * timeline：1試行のなかで起きることを順番に指定する。この実験でいうと[fixation, test]となってるので、固視点の後に実験刺激を呈示し、それに対する反応を取得するのが1試行ということになる。このうち、testという部品内でtimelineVariableを使ってるので、次の設定項目であるtimeline_variableでどの変数を参照するのかを指定しなくてはいけない。
+    * timeline_variables：timeline内で指定した部品で変数を使っている場合（今の例だとtest内でstimulusとcorrect_responseに変数を指定している）、変数を指定した部品をここに書かなくてはいけない。この実験ではtest_stimuliという部品で指定したので、そう書いている。
+    * repetitions：ほとんどの実験は実験条件あたり1回しか実施しないということはなく、複数回繰り返して実施する。その繰り返し回数を整数で指定する。
+    * randomize_order：通常、変数として指定した条件はランダム順で実施するので、これをtrueにしてランダム順にしておく。
+  * とても重要なこととして、test_procedureはtimelineにpushしておかなくてはいけない（これをpushするので、この中に入ってるfixationとtestもtimelineの中にようやく入ったことになる）。
+    
+```{JavaScript}
+    var test_procedure = {
+      timeline: [fixation, test, feedback],
+      timeline_variables: test_stimuli,
+      repetitions: 2,
+      randomize_order: true
+    }
+    timeline.push(test_procedure);
+```
+
+### debrief_block（実験部品5：必須ではない）
+  * 全試行が終わった後に実施される部品。この実験では実験結果を表示するために使っている。この実験でやってることの説明は以下を参照。
+    * type：表示をhtmlで行っているので、プラグインはhtml-keyboard-responseを使っている。
+    * stimulus：何を表示するかのところで、結果の中の大事そうなところを選んで表示するということをやっている。大事そうなデータを作ってるのは以下参照。
+      * trialsには結果の中からtaskの種類がtestのものだけを選んで代入している（fixationは除いている。このためにfixationやtestの中に、taskという設定項目があった）。
+      * correct_trialsには一つ前の項目で作ったtrialsの中から、反応が正解だったものだけを選んで代入している。
+      * accuraryには正答率を計算して代入している。
+      * rtには正反応のときの平均反応時間を計算して代入している。
+    * ただし、データの加工や計算、分析はここで無理にやらなくてもいいので、このあたりは参考までに見ておく程度でOK。基本的には全てのデータを保存しておいて、後でMATLABやRで処理するつもりの方が良い。
+  * この部品を実行する必要があるときは忘れずにtimelineにpushしておく。
+  
+```{JavaScript}
+   var debrief_block = {
+      type: "html-keyboard-response",
+      stimulus: function() {
+
+        var trials = jsPsych.data.get().filter({task: 'response'});
+        var correct_trials = trials.filter({correct: true});
+        var accuracy = Math.round(correct_trials.count() / trials.count() * 100);
+        var rt = Math.round(correct_trials.select('rt').mean());
+
+        return `<p>You responded correctly on ${accuracy}% of the trials.</p>
+          <p>Your average response time was ${rt}ms.</p>
+          <p>Press any key to complete the experiment. Thank you!</p>`;
+
+      }
+    };
+    timeline.push(debrief_block);
+```
+
+# 作った実験をQualtricsに載せる
+  * 以上のようにして作った実験がうまく動くことが確認できたらQualtricsに持っていく。基本的な仕組みは次のような感じ（[環境のセットアップ](./setup631.html)の手順を使って説明するので、見てない場合はまずはそっちを見ておくこと）。
+    * [環境のセットアップ](./setup631.html)の手順1をやる。もうやってあることは飛ばして良い。新しい実験を作る時にはrepository名は適当に変えておく（今の例ではmyexp1という名前にしたとする）。
+    * ここまでで作った実験の<script>から</script>の間にある**部品の部分（つまり、jsPsych.init以外の部分）**をコピーして、exp1.jsなど別の名前のjsファイルとして保存しておく。作成したjsファイルの1行目に、main.jsの1行目をコピペして、Githubのユーザ名(imaruになってる)部分とrepository名（jqTemplateになってる）は適切に変更する。
+)
+    * 次に、実験で使う画像や動画ファイルを全てimgフォルダに入れておく。
+    * 新しく作ったjsファイルの中にある、画像や動画の指定部分を書き換える。やり方は以下の感じ。
+      *  "jspsych-6.3.1/examples/img/blue.png" だったものを repo_site+'img/blue.png' にする
+    * ここまでで変更したことをGithubのサーバに反映させる。VSCodeを使ってる場合、左側にあるメニューの「ソース管理」という機能を使うと楽にやれる。
+      * ソース管理を選択
+      * 変更したファイルがリスト表示されるので、ファイルのあたりにカーソルを持っていくと表示されるプラス記号をクリックする。変更や追加した全てのファイルについて行う。
+      * 「メッセージ（'main'でコミットするための...」のように書いているところに、変更内容が分かるようなことを適当な英語で書いておく（なんでもいい。new experimentとか）。
+      * コミットをクリックする
+      * 変更の同期をクリックする
+    * 手順2の3
+      * instruction.htmlは基本的には変える必要がないので、そのまま実施。
+      * 次のQualtricsの設定も基本的に同じ。
+      * 次でqualtrics.jsの中をコピペする作業になるので、以下の変更を加える。
+        * 7行目のtask_githubに代入する内容を適切に変更する（Githubのユーザ名とrepository名）。
+        * 10行目以降の使用プラグインに、必要なプラグインを適宜加える。すでに書いてあるjspsych-html-keyboard-response.js などの行をコピペして、プラグイン名だけ変えて使えばOK。
+        * プラグインの並びの一番下にあるmain.jsを適切なものに変える（手順の最初で作ったjsファイルの名前)。
+        * これ以降は変更無し
+  * 以上の手順で実行できるはず（だけど、確認してないのでエラーなど起きたら言ってください。確認、修正します）。
+  * 実験作成でのこつや工夫などについて、あと2つくらい説明を書く予定です。ビデオ刺激のこと、リッカーとスケールのこと、画像呈示位置のこと、フィードバックの呈示方法のことくらい。
+  
