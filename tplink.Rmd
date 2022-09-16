@@ -36,7 +36,7 @@ output:
         * これをやらないと、せっかくインストールしたapiが使えない
         * PowerShellに以下を入力
           * npm -root -g
-        * C:\Users\imaru\AppData\Roaming\npm\node_moduiles などのように表示されるので、それをコピーする（imaruのところはユーザー名になるはず。\は円マークと同じだと思っておく）
+        * C:\\Users\\imaru\\AppData\\Roaming\\npm\\node_moduiles などのように表示されるので、それをコピーする（imaruのところはユーザー名になるはず。\は円マークと同じだと思っておく）
         * Windowsのコントローパネルから「システム環境変数の編集」を開く（Windows11の場合、pathで検索したらすぐ見つかった）
         * 環境変数ボタンを押す　
         * 上に「（ユーザー名）のユーザー環境変数」、下に「システム環境変数」とあるので、上の方gで新規を押す
