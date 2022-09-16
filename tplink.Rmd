@@ -1,0 +1,77 @@
+---
+title: "setup TP-Link"
+author: "Toshihide Imaruoka"
+date: "2022-09-16"
+output: 
+  rmdformats::downcute:
+    highlight: kate
+    dev: "ragg_png"
+---
+## TP-Linkのhs105をWindowsから使うためのセットアップ
+  * 参照した情報
+    * [スマートコンセント(HS105)を使って電気毛布を自動ON/OFF制御する](https://qiita.com/mitsuoka0423/items/582ff0c303abe8570ee5)
+      * 似たようなページはたくさんある
+    *[tplink-smarthome-api](https://github.com/plasticrake/tplink-smarthome-api)
+      * この仕組みの肝。このapiがあるから何とかなってる。
+  * 必要なファイル
+    * 2つのファイルをダウンロードして、ドキュメントフォルダに置いておく
+    * [tplink_on.js](./tplink_on.js)
+    * [tplink_off.js](./tplink_off.js)
+  * まずやるべきこと
+    * hs105というスマートプラグをLANに接続する
+      * 今のところ68.219のLANに繋がっている
+        * kasaというスマホアプリを使う
+        * 114実験室で使う時には、そこに繋げた方がいい
+      * hs105を操作するPCも同じLANに繋がっている必要がある
+  * tplink-smarthome-apiを使うための設定
+    * このapiはnode.jsという仕組みを使っているので、まずはその環境を整える
+      * Windows用のnode.jsをインストールする[node.js公式ダウンロード](https://nodejs.org/ja/download/)
+        * Windows Installerをダウンロード、インストールすればOK
+      * apiをインストールする
+        * WindowsのPowerShellを開く(ターミナルでもいいけどPowerShellの方が多分いい)
+        * PowerShellに以下のように入力する
+          * npm install -g tplink-smarthome-api
+          * 電気毛布のページその他に同じことが載ってるので参考にしても良い
+      * node.jsのPATHをWindows環境変数に設定する
+        * これをやらないと、せっかくインストールしたapiが使えない
+        * PowerShellに以下を入力
+          * npm -root -g
+        * C:\Users\imaru\AppData\Roaming\npm\node_moduiles などのように表示されるので、それをコピーする（imaruのところはユーザー名になるはず。\は円マークと同じだと思っておく）
+        * Windowsのコントローパネルから「システム環境変数の編集」を開く（Windows11の場合、pathで検索したらすぐ見つかった）
+        * 環境変数ボタンを押す　
+        * 上に「（ユーザー名）のユーザー環境変数」、下に「システム環境変数」とあるので、上の方gで新規を押す
+        * 変数名に「NODE_PATH」を入力し、変数値にさっきコピーしたものを貼り付ける
+        * OKを押す
+        * 環境変数の中にNODE_PATHが加わっていればOK
+      * hs105のIPアドレスを調べる
+        * PowerShellで次のように打ち込む
+        * tplink-smarthome-api search
+          * これも電気毛布のページも書いてる。表示される例も電気毛布ページ参照。
+        * IPアドレスがわかったら、tplink_on.jsとtplink_off.jsを開いて、IPアドレスのところを変更しておく。ダウンロード時は192.168.10.3になってるはず。
+      * 動作を確認する
+        * PowerShellのカレントディレクトリをドキュメントフォルダにする。おそらくPowerShellを開いた状態ではカレントが「C:\Users\imaru」のようにユーザフォルダになってるので、以下のように打ち込む
+          * cd Documents
+        * hs105のオン、オフを試す。PowerShellから以下のように入力
+          * node tplink_on.js
+          * node tplinl_off.js
+        * オン、オフができればOK
+      * MATLABから使う
+        * MATLABからさっきの命令を直接実行できるので、あまり問題はない。下のスクリプトが使用例。
+          * コマンドウィンドウで tplink(1) とやればON, tplink(0) とやればOFFになるはず。
+  * 問題点
+    * コマンドを実行してから実際にON/OFFされるまで遅れがある
+      * 下のMATLAB関数で測るとだいたい0.7秒くらいで変動している
+    * 実験の時間制御はコマンドを送った時点ではなく、それが終わった時点からで考えるべきか。それでもちょっとズレてそうではある。このあたり、詳しく調べる必要がありそう。
+        
+```{MATLAB}
+function tplink(onoff)
+st=GetSecs;
+if onoff
+  system('node C:\Users\imaru\Documents\tplink_on.js');
+else
+  system('node C:\Users\imaru\Documents\tplink_off.js');
+end
+disp(GetSecs-st);
+```
+
+    

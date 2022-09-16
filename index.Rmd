@@ -12,3 +12,6 @@ output:
   * [環境のセットアップ](setup631.html)
   * [実験の作り方](makingexps.html)
   
+## WindowsのMATLABからスマートプラグ（TP-Link hs105）を操作する
+  * [セットアップと動作確認](tplink.html)
+  
