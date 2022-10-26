@@ -1,0 +1,14 @@
+---
+title: "Benham top illusion"
+author: "Toshihide Imaruoka
+(imaru@neptune.kanazawa-it.ac.jp)"
+date: "2022-10-26"
+output: 
+  rmdformats::downcute:
+    highlight: kate
+    dev: "ragg_png"
+---
+  * Benham top図形のさまざまなパラメータ（孤の角度や太さ、本数、明領域と暗領域のコントラストなどなど）を変えて色の見えを計測するような研究を探しているのですが、なかなか見つけられない。
+    * [この論文](https://academic.oup.com/cercor/article/21/1/124/339359])あたりの記述によると、[Jarvis, 1970](https://scholar.google.com/scholar_lookup?title=On%20Fechner-Benham%20subjective%20colour&author=JR%20Jarvis&publication_year=1977&journal=Vision%20Res&volume=17&pages=445-451)で最適なパラメータが提案されているようだが、未入手。
+    * [このページ](https://michaelbach.de/ot/col-Benham/)にリンクのある[Le Rohellec J, Viénot F (2001)](https://onlinelibrary.wiley.com/doi/epdf/10.1002/1520-6378%282001%2926%3A1%2B%3C%3A%3AAID-COL38%3E3.0.CO%3B2-2)は見える色の種類については色々調べているが、見えやすさについてはやっていない。
+  * それほど複雑な刺激／現象ではないので、試してみるのが早そう。ということで簡単なプログラムを作って試したらどうかと思っています（ [このページ](https://michaelbach.de/ot/col-Benham/)で試せるものとほぼ同じですが、他のパラメータも変えられるように作っています）[動画のリンク](./IMG_1991.MOV)。
